@@ -1,0 +1,117 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: 'otel-collector'
+          scrape_interval: 10s
+          static_configs:
+            - targets: ['0.0.0.0:8889']
+
+  jaeger:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:14250
+
+  zipkin:
+    endpoint: 0.0.0.0:9411
+
+  filelog:
+    include:
+      - /var/log/**/*.log
+    exclude:
+      - /var/log/auth.log
+    operators:
+      - type: json_parser
+        timestamp:
+          parse_from: attributes.timestamp
+          layout: '%Y-%m-%d %H:%M:%S'
+
+processors:
+  batch:
+    timeout: 1s
+    send_batch_size: 1024
+
+  resource:
+    attributes:
+      - key: environment
+        value: "development"
+        action: insert
+      - key: service.version
+        from_attribute: version
+        action: insert
+
+  memory_limiter:
+    limit_mib: 512
+
+  resourcedetection:
+    detectors: [env, system, docker]
+    timeout: 5s
+
+  attributes:
+    actions:
+      - key: http.request.method
+        action: upsert
+        from_attribute: http.method
+      - key: http.response.status_code
+        action: upsert
+        from_attribute: http.status_code
+
+exporters:
+  jaeger:
+    endpoint: jaeger:14250
+    tls:
+      insecure: true
+
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+    const_labels:
+      environment: development
+
+  elasticsearch:
+    endpoints: [http://elasticsearch:9200]
+    logs_index: observability-logs
+    traces_index: observability-traces
+
+  logging:
+    loglevel: debug
+
+  otlp/ai-processor:
+    endpoint: http://ai-processor:4317
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp, jaeger, zipkin]
+      processors: [memory_limiter, resource, resourcedetection, batch]
+      exporters: [jaeger, elasticsearch, otlp/ai-processor, logging]
+
+    metrics:
+      receivers: [otlp, prometheus]
+      processors: [memory_limiter, resource, resourcedetection, batch]
+      exporters: [prometheus, logging]
+
+    logs:
+      receivers: [otlp, filelog]
+      processors: [memory_limiter, resource, resourcedetection, attributes, batch]
+      exporters: [elasticsearch, otlp/ai-processor, logging]
+
+  extensions: [health_check, pprof, zpages]
+
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+
+  pprof:
+    endpoint: 0.0.0.0:1777
+
+  zpages:
+    endpoint: 0.0.0.0:55679
