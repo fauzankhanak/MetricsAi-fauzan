@@ -26,6 +26,13 @@ from src.analytics import AnalyticsEngine
 from src.telemetry import setup_telemetry
 from src.health import HealthChecker
 
+# Intelligence enhancer import
+try:
+    from src.intelligence_enhancer import IntelligenceEnhancer, enhance_ai_response
+    INTELLIGENCE_ENHANCER_AVAILABLE = True
+except ImportError:
+    INTELLIGENCE_ENHANCER_AVAILABLE = False
+
 # Configure structured logging
 structlog.configure(
     processors=[

@@ -441,15 +441,71 @@ make clean && make build && make up
 make resources
 ```
 
+## 🧠 Enhancing AI Intelligence
+
+The system includes advanced AI intelligence features that can be enhanced with your data:
+
+### Quick Start (Demo Data)
+```bash
+# Train AI with sample data
+python scripts/enhance_ai_intelligence.py --demo
+```
+
+### Import Your Historical Data
+```bash
+# Import your incidents for learning
+python scripts/enhance_ai_intelligence.py --import-incidents your_incidents.json
+
+# Import with both incidents and metrics
+python scripts/enhance_ai_intelligence.py --incidents incidents.json --metrics metrics.json
+```
+
+### Expected Data Format
+Create `your_incidents.json`:
+```json
+{
+  "incidents": [
+    {
+      "title": "High CPU usage incident",
+      "timestamp": "2024-01-15T10:30:00Z",
+      "symptoms": ["high_cpu", "slow_response"],
+      "metrics": {"cpu": 92, "memory": 78, "latency": 3200},
+      "root_cause": "Inefficient database query",
+      "solution": "Optimized query and added indexing",
+      "prevention": ["Add query monitoring", "Review queries in deployment"]
+    }
+  ]
+}
+```
+
+### What This Does
+1. **Learns Your Environment**: Analyzes your normal vs abnormal patterns
+2. **Pattern Recognition**: Identifies recurring issues and solutions
+3. **Contextual Intelligence**: Provides specific advice for YOUR system
+4. **Continuous Learning**: Gets smarter with each incident you add
+
+After enhancement, restart the AI service:
+```bash
+docker-compose restart ai-processor chat-api
+```
+
+### Testing Enhanced Intelligence
+After training, test with these questions:
+- "Why is my CPU high?"
+- "What should I check for memory issues?"
+- "Analyze this error pattern for me"
+- "What patterns predict future outages?"
+
 ## 🎯 Next Steps
 
 After successful setup:
 
-1. **Explore the Chat Interface**: Try different queries
-2. **Set up Grafana Dashboards**: Create custom visualizations
-3. **Configure Alerts**: Set up notifications for issues
-4. **Integrate Your Applications**: Add OpenTelemetry instrumentation
-5. **Scale the System**: Move to production environment
+1. **Enhance AI Intelligence**: Train with your historical data (see above)
+2. **Explore the Chat Interface**: Try different queries
+3. **Set up Grafana Dashboards**: Create custom visualizations
+4. **Configure Alerts**: Set up notifications for issues
+5. **Integrate Your Applications**: Add OpenTelemetry instrumentation
+6. **Scale the System**: Move to production environment
 
 ## 📈 Scaling for Production
 
