@@ -40,6 +40,7 @@ chmod +x start.sh
 # 1. Set up environment
 cp .env.example .env
 # Edit .env and set your OPENAI_API_KEY
+# See docs/OPENAI_API_SETUP.md for detailed setup guide
 
 # 2. Start services
 make build && make up
